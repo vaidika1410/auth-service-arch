@@ -5,6 +5,7 @@ const adminRoutes = require('../services/admin/routes/admin.route')
 
 
 const port = 5000
+
 app.use(express.json())
 app.get('/', (req, res) => {
     return res.json({

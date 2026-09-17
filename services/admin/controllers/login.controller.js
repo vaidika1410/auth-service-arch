@@ -1,6 +1,7 @@
 const fs = require('fs/promises')
 const bcrypt = require('bcrypt')
 
+const path = '../data/data.json'
 const adminLogin = async (params) => {
     try{
         const {email, password} = params
@@ -19,24 +20,23 @@ const adminLogin = async (params) => {
         }
 
         let status = 'inactive'
-        const admins = JSON.parse(await fs.readFile('./data/admins.json', 'utf-8'))
-        console.log('before condition')
-        admins.forEach(async admin => {
-            if(admin.email === email) {
-                let compare = admin.password === password
-                console.log(compare)
-                if(compare) {
-                    console.log('admin exist')
-                    console.log(admin)
+        const data = JSON.parse(await fs.readFile(path, 'utf-8'))
+        const admins = data[0].admins
 
-                    admin.status = 'active'
+        // console.log(admins)
+        const admin = admins.find(a => a.email === email)
 
-                    await fs.writeFile('./data/admins.json', JSON.stringify(admins), 'utf-8')
-                }
-            } else {
-                throw "admin does not exist"
-            }
-        })
+        // console.log(admin)
+
+        if(!admin) {
+            throw 'admin does not exist'
+        }
+
+        admin.status = 'active'
+
+        await fs.writeFile(path, JSON.stringify(data), 'utf-8')
+
+        return admin
 
     } catch(error) {
         throw error

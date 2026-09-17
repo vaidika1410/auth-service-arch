@@ -1,29 +1,34 @@
 const express = require('express')
 const router = express.Router()
+const jwt = require('jsonwebtoken')
+require('dotenv').config({
+    path: '../.env'
+})
 
 const adminLoginController = require('../controllers/login.controller')
 const getUsersController = require('../controllers/getUsers.controller')
 const updateUserStatusController = require('../controllers/updateUserStatus.controller')
 
 const adminLogin = async (req, res) => {
-    try{
+    try {
+        let generatedToken = jwt.sign({ data: 'Token data' }, process.env.SECRET_KEY, { expiresIn: '60m' })
         const admin = await adminLoginController.adminLogin(req.body)
         return res.status(200).json({
-            message: "admin logged in successfully", admin
+            message: "admin logged in successfully", generatedToken, admin
         })
     } catch (error) {
         console.error(error.message)
         return res.status(400).json({
-            error: error.message
+            error: error
         })
     }
 }
 
 const getAllUsers = async (req, res) => {
-    try{
+    try {
         const users = await getUsersController.getUsers()
         return res.status(200).json({
-            message: "users fetched successfully", 
+            message: "users fetched successfully",
             users: users
         })
     } catch (error) {
@@ -34,13 +39,13 @@ const getAllUsers = async (req, res) => {
 }
 
 const updateUserStatus = async (req, res) => {
-    try{
+    try {
         const id = req.params.id
-        const user = updateUserStatusController.updateStatus(req.body, id)
+        const user = await updateUserStatusController.updateStatus(id)
         return res.status(200).json({
             message: "user status updated successfully"
         })
-    } catch(error) {
+    } catch (error) {
         return res.status(400).json({
             error: error
         })

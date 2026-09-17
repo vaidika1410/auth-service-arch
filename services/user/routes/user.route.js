@@ -2,11 +2,26 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
+const http = require('http')
+
 
 const userController = require('../controllers/user.controller')
 const multer = require('multer')
 
 const upload = multer({dest: 'uploads'})
+
+// http.createServer(function(req, res){
+//     res.write(200, {'content-type': 'text/html'})
+
+//     let url = req.url
+
+//     if(url === '/update-user') {
+
+//     }
+
+// }).listen(port, () => {
+//     console.log(`services server running on ${port}`)
+// })
 
 router.post('/register-user', registerUser)
 router.post('/login', loginUser)

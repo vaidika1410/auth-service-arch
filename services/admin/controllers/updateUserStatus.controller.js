@@ -1,24 +1,28 @@
 const fs = require('fs/promises')
 
-const updateStatus = async (params, id) => {
+const updateStatus = async (id) => {
     try {
-        const users = JSON.parse(await fs.readFile('./data/userProfile.json', 'utf-8'))
-        const registeredUsers = JSON.parse(await fs.readFile('./data/users.json', 'utf-8'))
+        const data = JSON.parse(await fs.readFile('../data/data.json', 'utf-8'))
+        // const registeredUsers = JSON.parse(await fs.readFile('./data/users.json', 'utf-8'))
 
-        const {status} = params
+        const users = data[0].users
+        console.log(users)
 
-        // console.log(status)
-        const user = users.find(user => user.id.toString() === id.toString())
-        user.status = status
+        const user = users.find(user => user.userId.toString() === id.toString())
+        user.status = 'inactive by admin'
 
-        const u = registeredUsers.find(user => user.id.toString() === id.toString())
-        u.status = status
+        // const u = registeredUsers.find(user => user.id.toString() === id.toString())
+        // u.status = status
         
         // users.push(user)
 
-        console.log(user.status)
-        await fs.writeFile('./data/userProfile.json', JSON.stringify(users), 'utf-8')
-        await fs.writeFile('./data/users.json', JSON.stringify(registeredUsers), 'utf-8')
+        if(user.status === 'inactive by admin') {
+            throw "user status already updated by admin"
+        }
+
+        // console.log(user.status)
+        await fs.writeFile('../data/data.json', JSON.stringify(data), 'utf-8')
+        // await fs.writeFile('./data/users.json', JSON.stringify(registeredUsers), 'utf-8')
 
         return user
 
