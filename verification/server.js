@@ -35,7 +35,7 @@ app.get('/verify', async (req, res) => {
         check.status = 'verified'
         console.log(check.status)
 
-        await fs.writeFile('../services/data/data.json', JSON.stringify(users), 'utf-8')
+        await fs.writeFile('../services/data/data.json', JSON.stringify(data), 'utf-8')
 
         console.log(token)
         return res.json({

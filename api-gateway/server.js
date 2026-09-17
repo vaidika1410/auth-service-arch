@@ -3,9 +3,28 @@ const app = express()
 const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const port = 4000
+var urlArray = ['http://localhost:5000','http://localhost:5001','http://localhost:5002'];
 
-app.use('/api', createProxyMiddleware({
-    target: 'http://localhost:5000',
+// for (let i = 0; i < urlArray.length; i++) {
+ 
+//     app.use('/api', createProxyMiddleware({
+//         target:  urlArray[i],
+//         changeOrigin: true
+//     }))
+// }
+
+// app.use('/admin', createProxyMiddleware({
+//     target: ,
+//     changeOrigin: true
+// }))
+
+app.use('/user', createProxyMiddleware({
+    target: 'http://localhost:5002',
+    changeOrigin: true
+}))
+
+app.use('/admin', createProxyMiddleware({
+    target: 'http://localhost:5001',
     changeOrigin: true
 }))
 

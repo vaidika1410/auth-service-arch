@@ -2,3 +2,6 @@
 services/.env
 services/data
 uploads
+node_modules
+verification/node_modules
+api-gateway/node_modules
