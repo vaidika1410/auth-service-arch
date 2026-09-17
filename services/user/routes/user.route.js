@@ -92,30 +92,7 @@ async function authenticate(req, res) {
 async function update(req, res) {
     try{
 
-        var authHeader = req.headers.authorization;
-        // if(!authHeader) {
-        //     throw "auth header must be provided"
-        // }
-        // // console.log(authHeader)
-        // if(authHeader) {
-            var token = authHeader.split(' ')[1]
-        //     if(!token) {
-        //         throw "token must be provided"
-        //     }
-        // }
-
-        console.log(token,"tokennnnnnnnnnnnnnnnnnnnn")
-
-
-        jwt.verify(token, process.env.SECRET_KEY, function(error, decoded) {
-            if(error) {
-                throw error
-            } else {
-                return decoded
-            }
-        })
-
-        const user = await userController.updateProfile(req.body, token)
+        const user = await userController.updateProfile(req.body)
         return res.status(200).json({
             message: "user updated successfully", user
         })

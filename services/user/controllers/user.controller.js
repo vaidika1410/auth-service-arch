@@ -2,17 +2,23 @@ const fs = require('fs/promises')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
-require('dotenv').config()
+require('dotenv').config({
+    path: '../.env'
+})
 const crypto = require('crypto')
 const multer = require('multer')
 const {nanoid} = require('nanoid')
 
+
+const path = '../data/data.json'
 async function registerUser(params) {
     try {
         // const users = JSON.parse(await fs.readFile('./data/users.json', 'utf-8'))
-        const data = JSON.parse(await fs.readFile('./data/data.json', 'utf-8'))
+        const data = JSON.parse(await fs.readFile(path, 'utf-8'))
 
         const users = data[0].users
+
+        console.log(users)
 
         console.log("register user api hit")
 
@@ -32,8 +38,8 @@ async function registerUser(params) {
         }
 
 
-        const existingUser = users.some(user => user.email === email)
-        // console.log(existingUser)
+        const existingUser = users.find(user => user.email === email)
+        console.log(existingUser)
 
         if (existingUser) {
             throw "user exist already, please use a different email"
@@ -58,9 +64,11 @@ async function registerUser(params) {
 
         users.push(user)
 
+        console.log(users)
+
         await sendEmail(user.email)
 
-        await fs.writeFile('./data/data.json', JSON.stringify(data), 'utf-8')
+        await fs.writeFile(path, JSON.stringify(data), 'utf-8')
 
 
     } catch (error) {
@@ -72,7 +80,7 @@ async function login(params) {
     try {
         console.log('login api hit')
 
-        const data = JSON.parse(await fs.readFile('./data/data.json', 'utf-8'))
+        const data = JSON.parse(await fs.readFile(path, 'utf-8'))
         // const loggedusers = JSON.parse(await fs.readFile('./data/loggedUsers.json', 'utf-8'))
         // console.log(users)
 
@@ -129,32 +137,31 @@ async function login(params) {
 
         // console.log(user)
 
-        await fs.writeFile('./data/data.json', JSON.stringify(data), 'utf-8')
+        await fs.writeFile(path, JSON.stringify(data), 'utf-8')
 
     } catch (error) {
         throw error
     }
 }
 
-async function updateProfile(params, token) {
+async function updateProfile(params) {
     try {
-        const users = JSON.parse(await fs.readFile('./data/data.json', 'utf-8'))
+        const data = JSON.parse(await fs.readFile(path, 'utf-8'))
         // const userProfiles = JSON.parse(await fs.readFile('./data/userProfile.json', 'utf-8'))
+
+        const users = data[0].users
 
         const { email, name, phone } = params
 
         const user = users.find(user => user.email === email)
-        console.log(user)
+        // console.log(user)
 
-        if (!user) {
+        if (user.loginStatus === 'inactive') {
             throw "user is logged out. please login first"
         }
 
-        const existing = userProfiles.find(user => user.email === email)
-        console.log("email exist", existing)
-
-        if (existing) {
-            throw "user profile already updated"
+        if (user.status !== 'verified') {
+            throw "user is not verified"
         }
 
         if (!email) {
@@ -173,21 +180,16 @@ async function updateProfile(params, token) {
             throw "phone number must contain 10 digits"
         }
 
-        const obj = {
-            id: user.id,
-            email: user.email,
+        const profile = {
             name: name,
             phone: phone,
-            password: user.password,
-            status: user.status,
-            date: user.date
+            update_date: new Date().toDateString()
         }
 
-        console.log(obj)
+        user.details = profile
+        console.log(user)
 
-        userProfiles.push(obj)
-        await fs.writeFile('./data/userProfile.json', JSON.stringify(userProfiles), 'utf-8')
-
+        await fs.writeFile(path, JSON.stringify(data), 'utf-8')
 
 
     } catch (error) {
@@ -202,7 +204,7 @@ const upload = multer({
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, 'uploads/')
+        callback(null, '../uploads/')
     },
     filename: (req, file, callback) => {
         callback(file.fieldname)
@@ -247,7 +249,7 @@ async function sendEmail(email) {
         console.log("send mail function is called")
         const token = crypto.randomBytes(32).toString('hex')
 
-        const tokens = JSON.parse(await fs.readFile('./data/verificationTokens.json', 'utf-8'))
+        const tokens = JSON.parse(await fs.readFile('../data/verificationTokens.json', 'utf-8'))
 
         console.log(token)
 
@@ -259,7 +261,7 @@ async function sendEmail(email) {
 
         tokens.push(t)
 
-        console.log(tokens)
+        // console.log(tokens)
 
         console.log('before sendMail')
         const info = await transporter.sendMail({
@@ -271,7 +273,7 @@ async function sendEmail(email) {
         })
         console.log('After sendMail')
 
-        await fs.writeFile('./data/verificationTokens.json', JSON.stringify(tokens), 'utf-8')
+        await fs.writeFile('../data/verificationTokens.json', JSON.stringify(tokens), 'utf-8')
         // console.log(info)
 
     } catch (error) {
