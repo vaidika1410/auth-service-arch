@@ -41,10 +41,19 @@ const getAllUsers = async (req, res) => {
 const updateUserStatus = async (req, res) => {
     try {
         const id = req.params.id
+
+        if(!id) {
+            return res.status(400).json({
+                message: "user-id is required"
+            })
+        }
+
         const user = await updateUserStatusController.updateStatus(id)
+
         return res.status(200).json({
             message: "user status updated successfully"
         })
+        
     } catch (error) {
         return res.status(400).json({
             error: error
