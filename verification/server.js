@@ -40,7 +40,7 @@ app.get('/verify', async (req, res) => {
         console.log(token)
         return res.json({
             // message: "verification link works", token
-            message: "user verified successfully"
+            message: "user verified successfully. You can safely close this tab."
         })
     } catch(error) {
         return res.status(400).json({

@@ -24,16 +24,14 @@ app.use((req, res, next) => {
 
     let token = authHeader.split(' ')[1]
 
-
-    if (req.path == '/auth/admin-login' || req.path == '/auth/users') {
+    if (req.path == '/auth/admin-login') {
         return next()
-        // console.log('login and register')
     } else {
         try {
             if (!token) {
                 return res.status(400).json({ message: 'token is missing' })
             }
-
+            
             const decode = jwt.verify(token, process.env.SECRET_KEY, function (error, decoded) {
                 if (error) {
                     return res.status(400).json({ message: "something went wrong", error })
@@ -46,7 +44,9 @@ app.use((req, res, next) => {
                 return res.status(400).json({ message: "token has expired" })
             }
 
-            req.user = decode
+            if(decode.role !== 'admin') {
+                return res.status(400).json({ message: "invalid token" })
+            }
 
             next()
 

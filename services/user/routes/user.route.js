@@ -25,7 +25,7 @@ const upload = multer({dest: 'uploads'})
 
 router.post('/register-user', registerUser)
 router.post('/login', loginUser)
-router.get('/authenticate', authenticate)
+// router.get('/authenticate', authenticate)
 router.post('/update-user', update)
 
 // router.post('/upload', userController.upload.single('image'), userController.uploadImage)
@@ -63,10 +63,12 @@ async function registerUser(req, res) {
 
 async function loginUser(req, res) {
     try{
-        let generatedToken = jwt.sign({ data: 'Token data' }, process.env.SECRET_KEY, { expiresIn: '60m' })
         const user = await userController.login(req.body)
+        let generatedToken = jwt.sign({ email: user.email, role: "user" }, process.env.SECRET_KEY, { expiresIn: '60m' })
+
+        // console.log(user.email)
         return res.status(200).json({
-            message: "user logged in successfully", generatedToken
+            message: "user logged in successfully", generatedToken, user
         })
     } catch(error) {
         return res.status(400).json({
@@ -75,19 +77,19 @@ async function loginUser(req, res) {
     }
 }
 
-async function authenticate(req, res) {
-    try{
-        let generatedToken = jwt.sign({ data: 'Token data' }, process.env.SECRET_KEY, { expiresIn: '60m' })
-        return res.status(200).json({
-            message: "here is your authentication token", 
-            token: generatedToken
-        })
-    } catch(error) {
-        return res.status(400).json({
-            error: error
-        })
-    }
-}
+// async function authenticate(req, res) {
+//     try{
+//         let generatedToken = jwt.sign({ data: 'Token data' }, process.env.SECRET_KEY, { expiresIn: '60m' })
+//         return res.status(200).json({
+//             message: "here is your authentication token", 
+//             token: generatedToken
+//         })
+//     } catch(error) {
+//         return res.status(400).json({
+//             error: error
+//         })
+//     }
+// }
 
 async function update(req, res) {
     try{

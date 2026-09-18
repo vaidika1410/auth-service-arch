@@ -85,7 +85,7 @@ async function login(params) {
         // console.log(users)
 
         const users = data[0].users
-        console.log(users)
+        // console.log(users)
 
         const { email, password } = params
 
@@ -104,40 +104,22 @@ async function login(params) {
 
         let existing = users.find(user => user.email === email)
         if (!existing) {
-            console.log('existing ', existing)
+            // console.log('existing ', existing)
             throw "user isn't registered"
         }
 
         const compare = await bcrypt.compare(password, existing.password)
-        console.log("passwords match", compare)
+        // console.log("passwords match", compare)
 
-        // if (compare) {
-        //     const info = await transporter.sendMail({
-        //         from: process.env.EMAIL_USER,
-        //         to: existing.email,
-        //         subject: "Email verification",
-        //         text: `Please click on the below link to get your verification token
-        //         http://localhost:4000/api/user/authenticate`
-        //     })
-        // }
+        if(existing.loginStatus === 'active') {
+            throw "user already logged in"
+        }
 
         existing.loginStatus = 'active'
 
-        // let id = loggedusers.length + 1
-
-        // const obj = {
-        //     id: id,
-        //     email: user.email,
-        //     password: user.password,
-        //     status: user.status,
-        //     date: new Date().toDateString()
-        // }
-
-        // users.push(obj)
-
-        // console.log(user)
-
         await fs.writeFile(path, JSON.stringify(data), 'utf-8')
+
+        return existing
 
     } catch (error) {
         throw error

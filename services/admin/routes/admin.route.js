@@ -11,8 +11,8 @@ const updateUserStatusController = require('../controllers/updateUserStatus.cont
 
 const adminLogin = async (req, res) => {
     try {
-        let generatedToken = jwt.sign({ data: 'Token data' }, process.env.SECRET_KEY, { expiresIn: '60m' })
         const admin = await adminLoginController.adminLogin(req.body)
+        let generatedToken = jwt.sign({ email: admin.email, role: admin.role }, process.env.SECRET_KEY, { expiresIn: '60m' })
         return res.status(200).json({
             message: "admin logged in successfully", generatedToken, admin
         })
