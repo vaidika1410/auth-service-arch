@@ -179,14 +179,10 @@ async function updateProfile(params) {
     }
 }
 
-const upload = multer({
-    dest: '../uploads'
-})
-
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, '../uploads/')
+        callback(null, '/uploads')
     },
     filename: (req, file, callback) => {
         callback(file.fieldname)
